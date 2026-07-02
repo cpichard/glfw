@@ -608,12 +608,17 @@ GLFWAPI void glfwSetInputMode(GLFWwindow* handle, int mode, int value)
             if (window->cursorMode == value)
                 return;
 
+            const int oldMode = window->cursorMode;
             window->cursorMode = value;
 
-            _glfw.platform.getCursorPos(window,
-                                        &window->virtualCursorPosX,
-                                        &window->virtualCursorPosY);
             _glfw.platform.setCursorMode(window, value);
+
+            if (value != GLFW_CURSOR_DISABLED && oldMode == GLFW_CURSOR_DISABLED)
+            {
+                double xpos, ypos;
+                _glfw.platform.getCursorPos(window, &xpos, &ypos);
+                _glfwInputCursorPos(window, xpos, ypos);
+            }
             return;
         }
 
